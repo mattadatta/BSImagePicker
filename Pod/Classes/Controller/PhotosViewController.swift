@@ -149,20 +149,26 @@ public final class PhotosViewController : UICollectionViewController {
     // MARK: Button actions
     func cancelButtonPressed(_ sender: UIBarButtonItem) {
         guard let closure = cancelClosure, let photosDataSource = photosDataSource else {
+            dismiss(animated: true, completion: nil)
             return
         }
         DispatchQueue.main.async {
             closure(photosDataSource.selections)
         }
+        
+        dismiss(animated: true, completion: nil)
     }
     
     func doneButtonPressed(_ sender: UIBarButtonItem) {
         guard let closure = finishClosure, let photosDataSource = photosDataSource else {
+            dismiss(animated: true, completion: nil)
             return
         }
         DispatchQueue.main.async {
             closure(photosDataSource.selections)
         }
+        
+        dismiss(animated: true, completion: nil)
     }
     
     func albumButtonPressed(_ sender: UIButton) {
