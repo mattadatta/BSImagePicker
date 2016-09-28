@@ -44,11 +44,11 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 }
 
 
-final class PhotosViewController : UICollectionViewController {    
-    var selectionClosure: ((_ asset: PHAsset) -> Void)?
-    var deselectionClosure: ((_ asset: PHAsset) -> Void)?
-    var cancelClosure: ((_ assets: [PHAsset]) -> Void)?
-    var finishClosure: ((_ assets: [PHAsset]) -> Void)?
+public final class PhotosViewController : UICollectionViewController {
+    public var selectionClosure: ((_ asset: PHAsset) -> Void)?
+    public var deselectionClosure: ((_ asset: PHAsset) -> Void)?
+    public var cancelClosure: ((_ assets: [PHAsset]) -> Void)?
+    public var finishClosure: ((_ assets: [PHAsset]) -> Void)?
     
     var doneBarButton: UIBarButtonItem?
     var cancelBarButton: UIBarButtonItem?
@@ -81,7 +81,7 @@ final class PhotosViewController : UICollectionViewController {
         return PreviewViewController(nibName: nil, bundle: nil)
     }()
     
-    required init(fetchResults: [PHFetchResult<PHAssetCollection>], defaultSelections: PHFetchResult<PHAsset>? = nil, settings aSettings: BSImagePickerSettings) {
+    required public init(fetchResults: [PHFetchResult<PHAssetCollection>], defaultSelections: PHFetchResult<PHAsset>? = nil, settings aSettings: BSImagePickerSettings) {
         albumsDataSource = AlbumTableViewDataSource(fetchResults: fetchResults)
         cameraDataSource = CameraCollectionViewDataSource(settings: aSettings, cameraAvailable: UIImagePickerController.isSourceTypeAvailable(.camera))
         self.defaultSelections = defaultSelections
@@ -92,7 +92,7 @@ final class PhotosViewController : UICollectionViewController {
         PHPhotoLibrary.shared().register(self)
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("b0rk: initWithCoder not implemented")
     }
     
@@ -100,7 +100,7 @@ final class PhotosViewController : UICollectionViewController {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
     
-    override func loadView() {
+    override public func loadView() {
         super.loadView()
         
         // Setup collection view
@@ -140,7 +140,7 @@ final class PhotosViewController : UICollectionViewController {
     }
     
     // MARK: Appear/Disappear
-    override func viewWillAppear(_ animated: Bool) {
+    override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         updateDoneButton()
@@ -325,7 +325,7 @@ final class PhotosViewController : UICollectionViewController {
 
 // MARK: UICollectionViewDelegate
 extension PhotosViewController {
-    override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+    override public func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         // NOTE: ALWAYS return false. We don't want the collectionView to be the source of thruth regarding selections
         // We can manage it ourself.
 
@@ -403,7 +403,7 @@ extension PhotosViewController {
         return false
     }
     
-    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    override public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let cell = cell as? CameraCell else {
             return
         }
@@ -414,17 +414,17 @@ extension PhotosViewController {
 
 // MARK: UIPopoverPresentationControllerDelegate
 extension PhotosViewController: UIPopoverPresentationControllerDelegate {
-    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+    public func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
         return .none
     }
     
-    func popoverPresentationControllerShouldDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) -> Bool {
+    public func popoverPresentationControllerShouldDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) -> Bool {
         return true
     }
 }
 // MARK: UINavigationControllerDelegate
 extension PhotosViewController: UINavigationControllerDelegate {
-    func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationControllerOperation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    public func navigationController(_ navigationController: UINavigationController, animationControllerFor operation: UINavigationControllerOperation, from fromVC: UIViewController, to toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         if operation == .push {
             return expandAnimator
         } else {
@@ -435,7 +435,7 @@ extension PhotosViewController: UINavigationControllerDelegate {
 
 // MARK: UITableViewDelegate
 extension PhotosViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // Update photos data source
         let album = albumsDataSource.fetchResults[indexPath.section][indexPath.row]
         initializePhotosDataSource(album)
@@ -449,7 +449,7 @@ extension PhotosViewController: UITableViewDelegate {
 
 // MARK: Traits
 extension PhotosViewController {
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         
         if let collectionViewFlowLayout = collectionViewLayout as? GridCollectionViewLayout {
@@ -468,7 +468,7 @@ extension PhotosViewController {
 
 // MARK: UIImagePickerControllerDelegate
 extension PhotosViewController: UIImagePickerControllerDelegate {
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else {
             picker.dismiss(animated: true, completion: nil)
             return
@@ -501,14 +501,14 @@ extension PhotosViewController: UIImagePickerControllerDelegate {
         })
     }
     
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+    public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
     }
 }
 
 // MARK: PHPhotoLibraryChangeObserver
 extension PhotosViewController: PHPhotoLibraryChangeObserver {
-    func photoLibraryDidChange(_ changeInstance: PHChange) {
+    public func photoLibraryDidChange(_ changeInstance: PHChange) {
         guard let photosDataSource = photosDataSource, let collectionView = collectionView else {
             return
         }
